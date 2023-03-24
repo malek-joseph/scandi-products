@@ -1,56 +1,101 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { toast } from "react-toastify";
+import './ProductAdd.css'
+import { NavLink } from 'react-router-dom';
 
-const products = [
-  {
-    sku: '12345',
-    name: 'Product 1',
-    price: 9.99,
-    size: 'Small',
-    dimension: '10x10x10cm'
-  },
-  {
-    sku: '67890',
-    name: 'Product 2',
-    price: 19.99,
-    size: 'Medium',
-    dimension: '20x20x20cm'
-  },
-  {
-    sku: '24680',
-    name: 'Product 3',
-    price: 29.99,
-    size: 'Large',
-    dimension: '30x30x30cm'
-  },
-  {
-    sku: '13579',
-    name: 'Product 4',
-    price: 39.99,
-    size: 'Extra Large',
-    dimension: '40x40x40cm'
-  }
-];
-
-const ProductCard = ({ product }) => (
+// =========================
+const Card = ({ sku, name, price, size, checked, onCheck }) => (
   <div className="card">
+    <div className="card-header">
+      <input type="checkbox" checked={checked} onChange={onCheck} />
+    </div>
     <div className="card-body">
-      <h5 className="card-title">{product.name}</h5>
-      <p className="card-text">SKU: {product.sku}</p>
-      <p className="card-text">Price: {product.price}</p>
-      <p className="card-text">Size: {product.size}</p>
-      <p className="card-text">Dimensions: {product.dimension}</p>
+      <div>{sku}</div>
+      <div>{name}</div>
+      <div>{price}</div>
+      <div>{size}</div>
     </div>
   </div>
 );
 
-const ProductList = () => (
-  <div className="row row-cols-4">
-    {products.map(product => (
-      <div className="col" key={product.sku}>
-        <ProductCard product={product} />
-      </div>
+const CardRow = ({ cards, onCardCheck }) => (
+  <div className="card-row">
+    {cards?.map((card) => (
+      <Card
+        key={card.sku}
+        sku={card.sku}
+        name={card.name}
+        price={card.price}
+        size={card.size}
+        checked={card.checked}
+        onCheck={() => onCardCheck(card.sku)}
+      />
     ))}
   </div>
 );
 
-export default ProductList;
+
+
+
+// =========================
+
+const ProductList = ({ cards, onCardCheck, onSaveSelection, onDeleteChecked }) => {
+
+  
+
+  const [selectAll, setSelectAll] = useState(false);
+
+  const handleSelectAll = (event) => {
+    const isChecked = event.target.checked;
+    setSelectAll(isChecked);
+    cards.forEach((card) => {
+      if (card.checked !== isChecked) {
+        onCardCheck(card.sku);
+      }
+    });
+  };
+
+  const handleSaveSelection = () => {
+    const selectedCards = cards.filter((card) => card.checked);
+    onSaveSelection(selectedCards);
+  };
+
+  const handleDeleteChecked = () => {
+    const checkedCards = cards.filter((card) => card.checked);
+    onDeleteChecked(checkedCards);
+  };
+
+  return (
+    <>
+      <div className="row sticky-top p-3">
+        <div className="col-6">
+          <h2>Product List</h2>
+        </div>
+        <div className="col-6 d-flex justify-content-end align-items-center">
+          <div className="form-group">
+            <NavLink to="/add-product">
+              <button type="submit" className="btn btn-primary me-2">Add</button>
+
+            </NavLink>
+            <button type="button" className="btn btn-secondary" >Mass Delete</button>
+          </div>
+        </div>
+    
+      </div>
+
+      <hr className='mt-3' />
+
+
+
+      {/* =========== */}
+
+      <div className="fixed-bottom bg-light d-flex align-items-center justify-content-center" style={{ height: '20%' }}>
+        <hr style={{ borderTop: '1px solid #ddd' }} />
+        <br />
+        <p className="text-muted text-center" style={{ fontSize: '0.8rem' }}>Scandiweb Test Assignment</p>
+      </div>
+    </>
+  )
+}
+
+export default ProductList

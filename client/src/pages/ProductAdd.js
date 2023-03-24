@@ -84,17 +84,24 @@ const AddProductForm = () => {
         </div>
 
         {productType === 'dvd' && (
-          <div className="form-group">
-            <label htmlFor="sizeInput">Size (MB):</label>
-            <input type="text" className="form-control" id="dvd" value={productTypeValue} onChange={handleProductTypeValueChange} />
-          </div>
+
+          <>
+            <p className='m-2 small'>Please provide the DVD size in Megabytes.</p>
+
+            <div className="form-group">
+              <label htmlFor="sizeInput">Size (MB):</label>
+              <input type="text" className="form-control" id="dvd" value={productTypeValue} onChange={handleProductTypeValueChange} />
+            </div>
+          
+          </>
+
         )}
 
         {productType === 'furniture' && (
 
           <>
             {/* {toast.info('Please provide dimensions in HxWxL format')} */}
-            <p className='m-2 small'>Please provide dimensions in HxWxL format</p>
+            <p className='m-2 small'>Please provide dimensions in HxWxL format.</p>
             <div className="form-group">
               <label htmlFor="heightInput">Height (cm):</label>
               <input type="text" className="form-control" id="height" value={height} onChange={(event) => setHeight(event.target.value)} />
@@ -113,6 +120,8 @@ const AddProductForm = () => {
           </>)}
         {productType === 'book' && (
           <>
+            <p className='m-2 small'>Please provide the Book weight in Kilograms.</p>
+
             <div className="form-group">
               <label htmlFor="weight">Weight (kg):</label>
               <input type="text" className="form-control" id="weight" value={weight} onChange={(event) => setWeight(event.target.value)} />

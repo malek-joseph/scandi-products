@@ -53,7 +53,7 @@ const App = () => {
       {/* The toast container shows the client a notification with a message of our own */}
       <Routes>
         <Route path="/" element={<ProductList />} />
-        <Route path="/addproduct" element={<ProductAdd />} />
+        <Route path="/add-product" element={<ProductAdd />} />
         <Route path="/test" element={<Test />} />
         {/* <Route path="/register/complete" element={<RegisterComplete />} /> */}
         {/* <Route exact path="/forgot/password" element={<ForgotPassword />} /> */}

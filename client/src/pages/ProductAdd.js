@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { toast } from "react-toastify";
 import './ProductAdd.css'
+import { useNavigate } from 'react-router-dom'
+import { addProduct } from '../api/add-product';
+
+
 
 const AddProductForm = () => {
   const [sku, setSku] = useState('');
@@ -13,6 +17,7 @@ const AddProductForm = () => {
   const [width, setWidth] = useState('');
   const [length, setLength] = useState('');
   const [weight, setWeight] = useState('');
+
 
   const handleProductTypeChange = (event) => {
     setProductType(event.target.value);
@@ -31,11 +36,29 @@ const AddProductForm = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     // TODO: Send product data to backend
+    // product is an object with all the specs of the product we will send to the backend
+    let product
+    addProduct(product).then().catch()
   };
 
+  const navigate = useNavigate()
+
   const handleCancel = (event) => {
+
     event.preventDefault();
-    // TODO: Clear form and redirect to home page
+    setSku('')
+    setName('')
+    setPrice('')
+    setProductType('')
+    setProductTypeValue('')
+    setSize('')
+    setHeight('')
+    setWidth('')
+    setLength('')
+    setWeight('')
+    navigate('/', { replace: true })
+
+    
   };
 
   return (

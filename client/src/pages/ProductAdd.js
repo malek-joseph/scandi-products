@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { toast } from "react-toastify";
 import './ProductAdd.css'
 import { useNavigate } from 'react-router-dom'
-import { addProduct } from '../api/add-product';
+// import { addProduct } from '../api/add-product';
+import axios from 'axios';
+
 
 
 
@@ -37,8 +39,19 @@ const AddProductForm = () => {
     event.preventDefault();
     // TODO: Send product data to backend
     // product is an object with all the specs of the product we will send to the backend
-    let product
-    addProduct(product).then().catch()
+
+    // addProduct(product).then(()=> {console.log('success');}).catch(err => console.log(err))
+    axios.post('http://localhost:8002/api/add-product', {
+     sku, name, price, productType, productTypeValue, size, height, width, length, weight 
+    })
+      .then(data => {
+        if (data.error) {
+          console.log(data.error);
+          return
+        }
+console.log('successful insert');
+      }) 
+      
   };
 
   const navigate = useNavigate()

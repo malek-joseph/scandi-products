@@ -26,7 +26,7 @@ const AddProductForm = () => {
     setProductTypeValue('');
     setSize('');
     setHeight('');
-    setWidth('');
+    setWidth(''); 
     setLength('');
     setWeight('');
   };
@@ -35,12 +35,24 @@ const AddProductForm = () => {
     setProductTypeValue(event.target.value);
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit =  (event) => {
     event.preventDefault();
-    let dimensions = height ? `${height}*${width}*${length}` : ''
-    let formData = { sku, name, price, size, weight, dimensions }
-    const response = await axios.post('http://localhost:8002/api/add-product', formData)
-    console.log(response);
+    let dimensions = height ? `${height}*${width}*${length}` : 0
+    axios.post('http://localhost:8002/api/add-product', { sku, name, price, size: size ? size : 0, weight: weight?weight: 0, dimensions: dimensions? dimensions:0 })
+      .then(res => {
+        console.log("success", res)
+        setSku('')
+        setName('')
+        setPrice('')
+        setSize('')
+        setWidth('')
+        setHeight('')
+        setWeight('')
+        setProductType('')
+        setProductTypeValue('')
+
+      })
+    .catch(err => console.log(err.response))
 
       
   };

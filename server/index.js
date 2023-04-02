@@ -4,6 +4,8 @@ const port = 8002;
 const mysql = require('mysql');
 const cors = require("cors");
 const bodyParser = require('body-parser');
+const router = express.Router();
+
 
 const db  = mysql.createConnection({
   host: "127.0.0.1",
@@ -13,23 +15,41 @@ const db  = mysql.createConnection({
   Port: 3306
 });
 
+app.use(express.json());
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post("/api/add-product", (req, res) => {
+
+app.get('/api/get-products', (req, res) => {
   db.connect((err) => {
     if (err) throw err;
-    console.log("Connected");
-    console.log(req.body);
-    const { sku, name, price, size, weight, dimensions } = req.body
+    console.log("DB Connected");
+    const sqlSelect = "SELECT * FROM products";
+    db.query(sqlSelect, (err, result) => {
+      if (err) throw err;
+      console.log(result);
+      res.send(result);
+    });
+  });
+})
+db.connect(function (err) {
+  if (err) throw err
+
+});
+
+app.post("/api/add-product", (req, res) => {
+  // console.log("body", req.body);
+  
+    console.log("DB Connected");
+    const { sku , name, price , size , weight , dimensions } = req.body
     const sqlInsert = "INSERT INTO products (sku, name, price, size, weight, dimensions) VALUES (?, ?, ?, ?, ?, ?)"
     db.query(sqlInsert, [sku, name, price, size, weight, dimensions], (err, result) => {
       if (err) throw err;
-      console.log(result);
+      // console.log(result);
       console.log("1 record inserted");
-    });
     res.send('DB working')
   })
+
 
 });
 
@@ -37,4 +57,5 @@ app.post("/api/add-product", (req, res) => {
 app.listen(port, () => {
   console.log('listening...');
 });
+
 

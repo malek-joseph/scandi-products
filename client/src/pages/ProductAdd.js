@@ -35,22 +35,13 @@ const AddProductForm = () => {
     setProductTypeValue(event.target.value);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // TODO: Send product data to backend
-    // product is an object with all the specs of the product we will send to the backend
+    let dimensions = height ? `${height}*${width}*${length}` : ''
+    let formData = { sku, name, price, size, weight, dimensions }
+    const response = await axios.post('http://localhost:8002/api/add-product', formData)
+    console.log(response);
 
-    // addProduct(product).then(()=> {console.log('success');}).catch(err => console.log(err))
-    axios.post('http://localhost:8002/api/add-product', {
-     sku, name, price, productType, productTypeValue, size, height, width, length, weight 
-    })
-      .then(data => {
-        if (data.error) {
-          console.log(data.error);
-          return
-        }
-console.log('successful insert');
-      }) 
       
   };
 

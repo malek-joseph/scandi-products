@@ -19,6 +19,7 @@ const AddProductForm = () => {
   const [width, setWidth] = useState('');
   const [length, setLength] = useState('');
   const [weight, setWeight] = useState('');
+  const navigate = useNavigate()
 
 
   const handleProductTypeChange = (event) => {
@@ -50,6 +51,7 @@ const AddProductForm = () => {
         setWeight('')
         setProductType('')
         setProductTypeValue('')
+        navigate('/', {replace: true})
 
       })
     .catch(err => console.log(err.response))
@@ -57,7 +59,6 @@ const AddProductForm = () => {
       
   };
 
-  const navigate = useNavigate()
 
   const handleCancel = (event) => {
 
@@ -116,9 +117,9 @@ const AddProductForm = () => {
           <label htmlFor="productTypeInput">Type:</label>
           <select className="form-control" id="productType" value={productType} onChange={handleProductTypeChange}>
             <option value="">Select a type</option>
-            <option value="dvd">DVD</option>
-            <option value="furniture">Furniture</option>
-            <option value="book">Book</option>
+            <option id='DVD' value="dvd">DVD</option>
+            <option id='Furniture' value="furniture">Furniture</option>
+            <option id='Book' value="book">Book</option>
           </select>
         </div>
 
@@ -128,8 +129,8 @@ const AddProductForm = () => {
             <p className='m-2 small'>Please provide the DVD size in Megabytes.</p>
 
             <div className="form-group">
-              <label htmlFor="sizeInput">Size (MB):</label>
-              <input type="text" className="form-control" id="dvd" value={productTypeValue} onChange={handleProductTypeValueChange} />
+              <label htmlFor="sizeInput">Size (MB)</label>
+              <input type="text" className="form-control" id="size" value={productTypeValue} onChange={handleProductTypeValueChange} />
             </div>
           
           </>
@@ -142,17 +143,17 @@ const AddProductForm = () => {
             {/* {toast.info('Please provide dimensions in HxWxL format')} */}
             <p className='m-2 small'>Please provide dimensions in HxWxL format.</p>
             <div className="form-group">
-              <label htmlFor="heightInput">Height (cm):</label>
+              <label htmlFor="heightInput">Height (CM)</label>
               <input type="text" className="form-control" id="height" value={height} onChange={(event) => setHeight(event.target.value)} />
             </div>
 
             <div className="form-group">
-              <label htmlFor="widthInput">Width (cm):</label>
+              <label htmlFor="widthInput">Width (CM)</label>
               <input type="text" className="form-control" id="width" value={width} onChange={(event) =>
                 setWidth(event.target.value)} />
             </div>
             <div className="form-group">
-              <label htmlFor="lengthInput">length (cm):</label>
+              <label htmlFor="lengthInput">length (CM)</label>
               <input type="text" className="form-control" id="length" value={length} onChange={(event) =>
                 setLength(event.target.value)} />
             </div>
@@ -162,7 +163,7 @@ const AddProductForm = () => {
             <p className='m-2 small'>Please provide the Book weight in Kilograms.</p>
 
             <div className="form-group">
-              <label htmlFor="weight">Weight (kg):</label>
+              <label htmlFor="weight">Weight (KG):</label>
               <input type="text" className="form-control" id="weight" value={weight} onChange={(event) => setWeight(event.target.value)} />
             </div>
 

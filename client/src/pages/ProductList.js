@@ -66,7 +66,8 @@ const ProductList = () => {
  
 
   return (
-    <>
+    <div className="container my-4 " style = {{ paddingBottom: '20%' }
+}>
       {/* ======Header===== */}
 
       <div className="row sticky-top p-3">
@@ -78,7 +79,7 @@ const ProductList = () => {
             <NavLink to="/add-product">
               <button type="submit" className="btn btn-primary me-2">Add</button>
             </NavLink>
-            <button type="button" className="btn btn-secondary" onClick={handleDelete}>Mass Delete</button>
+            <button type="button" id='delete-product-btn' className="btn btn-secondary" onClick={handleDelete}>Mass Delete</button>
           </div>
         </div>
         
@@ -97,7 +98,7 @@ const ProductList = () => {
         <br />
         <p className="text-muted text-center" style={{ fontSize: '0.8rem' }}>Scandiweb Test Assignment</p>
       </div>
-    </>
+    </div>
   )
 }
 

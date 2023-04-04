@@ -55,7 +55,6 @@ app.post("/api/add-product", (req, res) => {
 
 app.get("/api/", (req, res) => {
   // console.log("body", req.body);
-
   console.log("DB Connected");
   const sqlSelect = "SELECT * FROM products";
   db.query(sqlSelect, (err, result) => {
@@ -66,16 +65,17 @@ app.get("/api/", (req, res) => {
 
 });
 
-app.delete('/delete', (req, res) => {
-  const { checkedProductIds } = req.body;
+app.delete('/api/delete', (req, res) => {
+  console.log(req.skus);
+  const { skus } = req.body;
 
-  if (!Array.isArray(checkedProductIds)) {
-    res.status(400).send('Invalid input: checkedProductIds must be an array');
+  if (!Array.isArray(skus)) {
+    res.status(400).send('Invalid input: skus must be an array');
     return;
   }
 
-  const sqlDelete = "DELETE FROM products WHERE id IN (?)";
-  db.query(sqlDelete, [checkedProductIds], (err, result) => {
+  const sqlDelete = "DELETE FROM products WHERE sku IN (?)";
+  db.query(sqlDelete, [skus], (err, result) => {
     if (err) {
       res.status(500).send(`Error deleting products: ${err.message}`);
       return;

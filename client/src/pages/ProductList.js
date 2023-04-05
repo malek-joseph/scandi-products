@@ -47,6 +47,8 @@ const ProductList = () => {
   }
   //=========Card  UI
   const Card = ({ sku, name, price, size, weight, dimensions, isChecked }) => {
+    // console.log(dimensions);
+
     return (
       <div className="card">
         <div className="card-header">
@@ -60,7 +62,8 @@ const ProductList = () => {
           <div>${price}</div>
           {size !== 0 && <div>Size: {size}</div>}
           {weight !== 0 && <div>Weight: {weight}</div>}
-          {dimensions !== 0 || "**" && <div>Dimensions: {dimensions}</div>}
+          {dimensions != 0 && <div>Dimensions: {dimensions}</div>}
+
         </div>
       </div>
     );

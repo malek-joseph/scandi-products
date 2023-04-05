@@ -19,7 +19,7 @@ const AddProductForm = () => {
   });
 
   const [errors, setErrors] = useState({
-    skuDuplicate: false,
+    sku: false,
     skuMissing: false,
     nameMissing: false,
     priceMissing: false,
@@ -43,37 +43,101 @@ const AddProductForm = () => {
     if (product.productType === 'dvd') {
       setProduct((prevState) => ({ ...prevState, size: value }));
     } else if (product.productType === 'furniture') {
-      const [heightValue, widthValue, lengthValue] = value.split('x');
-      setProduct((prevState) => ({
-        ...prevState,
-        height: heightValue,
-        width: widthValue,
-        length: lengthValue,
-      }));
+      const inputId = event.target.id;
+      if (inputId === 'height') {
+        setProduct((prevState) => ({ ...prevState, height: value }));
+      } else if (inputId === 'width') {
+        setProduct((prevState) => ({ ...prevState, width: value }));
+      } else if (inputId === 'length') {
+        setProduct((prevState) => ({ ...prevState, length: value }));
+      }
     } else if (product.productType === 'book') {
       setProduct((prevState) => ({ ...prevState, weight: value }));
     }
   };
 
+
   const handleSubmit = (event) => {
     event.preventDefault();
+    const productTypeValidation = {
+      dvd: (product) => !!product.size,
+      furniture: (product) => !!product.height && !!product.width && !!product.length,
+      book: (product) => !!product.weight
+    };
+    const errorMessages = {
+  sku: 'Please enter a SKU',
+  name: 'Please enter a product name',
+  price: 'Please enter a price',
+  size: 'Please enter a size',
+  height: 'Please enter a height',
+  width: 'Please enter a width',
+  length: 'Please enter a length',
+  weight: 'Please enter a weight'
+};
     let dimensions = product.height ? `${product.height}*${product.width}*${product.length}` : 0
     const allFieldsFilled = () => {
-      if (product.sku && product.price && product.name) {
-        if ((product.productType === 'dvd' && product.size) || (product.productType === 'furniture' && product.product.width && product.height && product.length) || (product.productType === 'book' && product.weight)) {
-          return true
-        } else {
-          return false
-        }
+      let errors = {};
+
+      if (!product.sku) {
+        errors.skuMissing = true;
       }
-      else {
-        return false
+      if (!product.price) {
+        errors.priceMissing = true;
+      }
+      if (!product.name) {
+        errors.nameMissing = true;
       }
 
-    }
+      if (product.productType === 'dvd' && !product.size) {
+        errors.sizeMissing = true;
+      } else if (product.productType === 'furniture') {
+        if (!product.height) {
+          errors.heightMissing = true;
+        }
+        if (!product.width) {
+          errors.widthMissing = true;
+        }
+        if (!product.length) {
+          errors.lengthMissing = true;
+        }
+      } else if (product.productType === 'book' && !product.weight) {
+        errors.weightMissing = true;
+      }
+
+      setErrors(errors);
+
+      return Object.keys(errors).length === 0;
+    };
+
+    // const allFieldsFilled = () => {
+    //   const requiredFields = {
+    //     sku: product.sku,
+    //     name: product.name,
+    //     price: product.price,
+    //     size: product.productType === 'dvd' ? product.size : null,
+    //     height: product.productType === 'furniture' ? product.height : null,
+    //     width: product.productType === 'furniture' ? product.width : null,
+    //     length: product.productType === 'furniture' ? product.length : null,
+    //     weight: product.productType === 'book' ? product.weight : null
+    //   };
+
+    //   const isValid = Object.keys(requiredFields).every(key => {
+    //     const value = requiredFields[key];
+    //     const isPresent = !!value;
+    //     if (!isPresent) {
+    //       setErrors(errors => ({ ...errors, [`${key}Missing`]: errorMessages[key] }));
+    //     } else {
+    //       setErrors(errors => ({ ...errors, [`${key}Missing`]: null }));
+    //     }
+    //     return isPresent;
+    //   });
+
+    //   return isValid && productTypeValidation[product.productType](product);
+    // };
+
+    console.log(allFieldsFilled());
     if (allFieldsFilled()) {
-      
-      axios.post('http://localhost:8002/api/add-product', { sku: product.sku, name: product.name, price: product.price, size: product.size ? product.size : 0, weight: product.weight ? product.weight : 0, dimensions: dimensions ? dimensions : 0 })
+      axios.post('http://localhost:8002/api/add-product', { sku: product.sku, name: product.name, price: product.price, size: product.size ? product.size : 0, weight: product.weight ? product.weight : 0, dimensions: dimensions ? `${product.height}*${product.width}*${product.length}` : 0 })
         .then((res) => {
           setErrors({});
           setProduct({
@@ -92,12 +156,15 @@ const AddProductForm = () => {
 
         })
         .catch((error) => {
+          
           console.log(error);
-          if (error.response && error.response.status === 409) {
+          if (error.response && error.response.status === 400) {
             setErrors({
               ...errors,
               sku: 'SKU already exists',
             });
+            console.log('duplicate error', errors.sku);
+
           }
         });
     } else {
@@ -149,8 +216,8 @@ const AddProductForm = () => {
         <hr className='mt-3' />
         <div className="form-group mt-3">
           <label htmlFor="skuInput" >SKU:</label>
-          <input type="text" className={`form-control ${errors.skuDuplicate || errors.skuMissing ? 'is-invalid' : ''}`} id="sku" value={product.sku} onChange={handleChange} />
-          {errors.skuDuplicate && <div className="invalid-feedback">SKU already exists</div>}
+          <input type="text" className={`form-control ${errors.sku || errors.skuMissing ? 'is-invalid' : ''}`} id="sku" value={product.sku} onChange={handleChange} />
+          {errors.sku && <div className="invalid-feedback">SKU already exists</div>}
           {errors.skuMissing && <div className="invalid-feedback">Please enter a SKU</div>}
         </div>
         <div className="form-group">

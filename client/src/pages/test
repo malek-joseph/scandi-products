@@ -1,0 +1,81 @@
+
+  // const handleSubmit = (event) => {
+  //   event.preventDefault();
+  //   const productTypeValidation = {
+  //     dvd: (product) => !!product.size,
+  //     furniture: (product) => !!product.height && !!product.width && !!product.length,
+  //     book: (product) => !!product.weight
+  //   };
+
+  //   let dimensions = product.height ? `${product.height}*${product.width}*${product.length}` : 0
+  //   const allFieldsFilled = () => {
+  //     let errors = {};
+
+  //     if (!product.sku) {
+  //       errors.skuMissing = true;
+  //     }
+  //     if (!product.price) {
+  //       errors.priceMissing = true;
+  //     }
+  //     if (!product.name) {
+  //       errors.nameMissing = true;
+  //     }
+
+  //     if (product.productType === 'dvd' && !product.size) {
+  //       errors.sizeMissing = true;
+  //     } else if (product.productType === 'furniture') {
+  //       if (!product.height) {
+  //         errors.heightMissing = true;
+  //       }
+  //       if (!product.width) {
+  //         errors.widthMissing = true;
+  //       }
+  //       if (!product.length) {
+  //         errors.lengthMissing = true;
+  //       }
+  //     } else if (product.productType === 'book' && !product.weight) {
+  //       errors.weightMissing = true;
+  //     }
+
+  //     setErrors(errors);
+
+  //     return Object.keys(errors).length === 0;
+  //   };
+
+//===========================================
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    const productTypeValidation = {
+      dvd: ['size'],
+      furniture: ['height', 'width', 'length'],
+      book: ['weight'],
+    };
+
+    const productFields = {
+      sku: true,
+      name: true,
+      price: true,
+      size: false,
+      height: false,
+      width: false,
+      length: false,
+      weight: false,
+    };
+
+    const { productType } = product;
+    const requiredFields = productTypeValidation[productType];
+    if (requiredFields) {
+      requiredFields.forEach((field) => {
+        productFields[field] = true;
+      });
+    }
+
+    const allFieldsFilled = Object.values(productFields).every((filled) => filled);
+    if (allFieldsFilled) {
+      // send product data to server
+    } else {
+      alert('All fields are required');
+    }
+  };

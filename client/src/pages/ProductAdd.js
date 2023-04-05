@@ -56,88 +56,49 @@ const AddProductForm = () => {
     }
   };
 
+//=========
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
     const productTypeValidation = {
-      dvd: (product) => !!product.size,
-      furniture: (product) => !!product.height && !!product.width && !!product.length,
-      book: (product) => !!product.weight
-    };
-    const errorMessages = {
-  sku: 'Please enter a SKU',
-  name: 'Please enter a product name',
-  price: 'Please enter a price',
-  size: 'Please enter a size',
-  height: 'Please enter a height',
-  width: 'Please enter a width',
-  length: 'Please enter a length',
-  weight: 'Please enter a weight'
-};
-    let dimensions = product.height ? `${product.height}*${product.width}*${product.length}` : 0
-    const allFieldsFilled = () => {
-      let errors = {};
-
-      if (!product.sku) {
-        errors.skuMissing = true;
-      }
-      if (!product.price) {
-        errors.priceMissing = true;
-      }
-      if (!product.name) {
-        errors.nameMissing = true;
-      }
-
-      if (product.productType === 'dvd' && !product.size) {
-        errors.sizeMissing = true;
-      } else if (product.productType === 'furniture') {
-        if (!product.height) {
-          errors.heightMissing = true;
-        }
-        if (!product.width) {
-          errors.widthMissing = true;
-        }
-        if (!product.length) {
-          errors.lengthMissing = true;
-        }
-      } else if (product.productType === 'book' && !product.weight) {
-        errors.weightMissing = true;
-      }
-
-      setErrors(errors);
-
-      return Object.keys(errors).length === 0;
+      dvd: ['size'],
+      furniture: ['height', 'width', 'length'],
+      book: ['weight'],
     };
 
-    // const allFieldsFilled = () => {
-    //   const requiredFields = {
-    //     sku: product.sku,
-    //     name: product.name,
-    //     price: product.price,
-    //     size: product.productType === 'dvd' ? product.size : null,
-    //     height: product.productType === 'furniture' ? product.height : null,
-    //     width: product.productType === 'furniture' ? product.width : null,
-    //     length: product.productType === 'furniture' ? product.length : null,
-    //     weight: product.productType === 'book' ? product.weight : null
-    //   };
+    const productFields = {
+      sku: true,
+      name: true,
+      price: true,
+      size: false,
+      height: false,
+      width: false,
+      length: false,
+      weight: false,
+    };
 
-    //   const isValid = Object.keys(requiredFields).every(key => {
-    //     const value = requiredFields[key];
-    //     const isPresent = !!value;
-    //     if (!isPresent) {
-    //       setErrors(errors => ({ ...errors, [`${key}Missing`]: errorMessages[key] }));
-    //     } else {
-    //       setErrors(errors => ({ ...errors, [`${key}Missing`]: null }));
-    //     }
-    //     return isPresent;
-    //   });
+    const { productType } = product;
+    const requiredFields = productTypeValidation[productType];
+    if (requiredFields) {
+      requiredFields.forEach((field) => {
+        productFields[field] = true;
+      });
+    }
 
-    //   return isValid && productTypeValidation[product.productType](product);
-    // };
-
-    console.log(allFieldsFilled());
-    if (allFieldsFilled()) {
-      axios.post('http://localhost:8002/api/add-product', { sku: product.sku, name: product.name, price: product.price, size: product.size ? product.size : 0, weight: product.weight ? product.weight : 0, dimensions: dimensions ? `${product.height}*${product.width}*${product.length}` : 0 })
+    const allFieldsFilled = Object.values(productFields).every((filled) => filled);
+    if (allFieldsFilled) {
+      axios.post('http://localhost:8002/api/add-product', {
+        sku: product.sku,
+        name: product.name,
+        price: product.price,
+        size: product.productType === 'dvd' ? product.size || 0 : null,
+        weight: product.productType === 'book' ? product.weight || 0 : null,
+        dimensions:
+          product.productType === 'furniture'
+            ? `${product.height}*${product.width}*${product.length}`
+            : null,
+      })
         .then((res) => {
           setErrors({});
           setProduct({
@@ -152,27 +113,110 @@ const AddProductForm = () => {
             length: '',
             weight: '',
           });
-          navigate('/', { replace: true })
-
+          navigate('/', { replace: true });
         })
         .catch((error) => {
-          
           console.log(error);
           if (error.response && error.response.status === 400) {
             setErrors({
               ...errors,
               sku: 'SKU already exists',
             });
-            console.log('duplicate error', errors.sku);
-
           }
         });
-    } else {
-      console.log(allFieldsFilled());
-      console.log(product.sku, product.price, product.name, product.productType, product.size, product.height, product.weight, product.width, product.weight);
-      alert('All fields are required')
+ } else {
+      alert('All fields are required');
     }
   };
+  //============
+
+
+//===========================================
+
+   
+//   const handleSubmit = (event) => {
+//     event.preventDefault();
+//     const productTypeValidation = {
+//       dvd: (product) => !!product.size,
+//       furniture: (product) => !!product.height && !!product.width && !!product.length,
+//       book: (product) => !!product.weight
+//     };
+
+//     let dimensions = product.height ? `${product.height}*${product.width}*${product.length}` : 0
+//     const allFieldsFilled = () => {
+//       let errors = {};
+
+//       if (!product.sku) {
+//         errors.skuMissing = true;
+//       }
+//       if (!product.price) {
+//         errors.priceMissing = true;
+//       }
+//       if (!product.name) {
+//         errors.nameMissing = true;
+//       }
+
+//       if (product.productType === 'dvd' && !product.size) {
+//         errors.sizeMissing = true;
+//       } else if (product.productType === 'furniture') {
+//         if (!product.height) {
+//           errors.heightMissing = true;
+//         }
+//         if (!product.width) {
+//           errors.widthMissing = true;
+//         }
+//         if (!product.length) {
+//           errors.lengthMissing = true;
+//         }
+//       } else if (product.productType === 'book' && !product.weight) {
+//         errors.weightMissing = true;
+//       }
+
+//       setErrors(errors);
+
+//       return Object.keys(errors).length === 0;
+//     };
+
+// //===========================================
+
+//     console.log(allFieldsFilled());
+//     if (allFieldsFilled()) {
+//       axios.post('http://localhost:8002/api/add-product', { sku: product.sku, name: product.name, price: product.price, size: product.size ? product.size : 0, weight: product.weight ? product.weight : 0, dimensions: dimensions ? `${product.height}*${product.width}*${product.length}` : 0 })
+//         .then((res) => {
+//           setErrors({});
+//           setProduct({
+//             sku: '',
+//             name: '',
+//             price: '',
+//             productType: '',
+//             productTypeValue: '',
+//             size: '',
+//             height: '',
+//             width: '',
+//             length: '',
+//             weight: '',
+//           });
+//           navigate('/', { replace: true })
+
+//         })
+//         .catch((error) => {
+          
+//           console.log(error);
+//           if (error.response && error.response.status === 400) {
+//             setErrors({
+//               ...errors,
+//               sku: 'SKU already exists',
+//             });
+//             console.log('duplicate error', errors.sku);
+
+//           }
+//         });
+//     } else {
+//       console.log(allFieldsFilled());
+//       console.log(product.sku, product.price, product.name, product.productType, product.size, product.height, product.weight, product.width, product.weight);
+//       alert('All fields are required')
+//     }
+//   };
 
 
   const handleCancel = (event) => {

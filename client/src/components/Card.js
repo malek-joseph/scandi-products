@@ -8,10 +8,10 @@ const Card = ({ sku, name, price, size, weight, dimensions, onDelete }) => {
   };
 
   const handleDeleteClick = () => {
-    onDelete();
+    onDelete(sku);
   };
 
-  return (
+ return (
     <div className="card">
       <div className="card-header">
         <input type="checkbox" className='delete-checkbox' checked={isChecked} onChange={handleCheckboxChange} />
@@ -28,4 +28,4 @@ const Card = ({ sku, name, price, size, weight, dimensions, onDelete }) => {
   );
 };
 
-export default Card;
+// export default Card;

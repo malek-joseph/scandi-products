@@ -38,20 +38,27 @@ db.connect(function (err) {
 });
 
 app.post("/api/add-product", (req, res) => {
-  // console.log("body", req.body);
-  
-    console.log("DB Connected");
-    const { sku , name, price , size , weight , dimensions } = req.body
-    const sqlInsert = "INSERT INTO products (sku, name, price, size, weight, dimensions) VALUES (?, ?, ?, ?, ?, ?)"
-    db.query(sqlInsert, [sku, name, price, size, weight, dimensions], (err, result) => {
-      if (err) throw err;
-      // console.log(result);
-      console.log("1 record inserted");
-    res.send('DB working')
-  })
-
-
+  const { sku, name, price, size, weight, dimensions } = req.body;
+  const sqlInsert =
+    "INSERT INTO products (sku, name, price, size, weight, dimensions) VALUES (?, ?, ?, ?, ?, ?)";
+  db.query(
+    sqlInsert,
+    [sku, name, price, size, weight, dimensions],
+    (err, result) => {
+      if (err) {
+        if (err.code === "ER_DUP_ENTRY") {
+          res.status(400).send("SKU already exists");
+        } else {
+          console.error(err);
+          res.status(500).send("Internal server error");
+        }
+      } else {
+        res.status(201).send(result);
+      }
+    }
+  );
 });
+
 
 app.get("/api/", (req, res) => {
   // console.log("body", req.body);

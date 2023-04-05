@@ -1,27 +1,26 @@
-import React from 'react';
-import Card from './Card';
-import './Cards.css'
+// import React from 'react';
+// import Card from './Card';
+// import './Cards.css'
 
 
 
-const Cards = (products) => {
-  const renderCards = () => {
+// const Cards = (products) => {
 
-    return products?.map((product) => (
-      <div className="card-column" key={product.sku}>
-        <Card
-          sku={product.sku}
-          name={product.name}
-          price={product.price}
-          size={product.size}
-          weight={product.weight}
-          dimensions={product.dimensions}
-        />
-      </div>
-    ));
-  };
 
-  return <div className="card-row">{renderCards()}</div>;
-};
 
-// export default Cards
+
+//   const renderCards = () => {
+
+//     const handleDelete = (sku) => {
+//       setProducts(products.filter(p => p.sku !== sku));
+//     };
+
+//     const handleMassDelete = (skus) => {
+//       setProducts(products.filter(p => !skus.includes(p.sku)));
+//     };
+
+
+
+// };
+
+// // export default Cards

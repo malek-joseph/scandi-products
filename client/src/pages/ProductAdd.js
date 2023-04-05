@@ -1,88 +1,140 @@
 import React, { useState } from 'react';
-import { toast } from "react-toastify";
 import './ProductAdd.css'
 import { useNavigate } from 'react-router-dom'
 // import { addProduct } from '../api/add-product';
 import axios from 'axios';
 
-
-
-
 const AddProductForm = () => {
-  const [sku, setSku] = useState('');
-  const [name, setName] = useState('');
-  const [price, setPrice] = useState('');
-  const [productType, setProductType] = useState('');
-  const [productTypeValue, setProductTypeValue] = useState('');
-  const [size, setSize] = useState('');
-  const [height, setHeight] = useState('');
-  const [width, setWidth] = useState('');
-  const [length, setLength] = useState('');
-  const [weight, setWeight] = useState('');
+  const [product, setProduct] = useState({
+    sku: '',
+    name: '',
+    price: '',
+    productType: '',
+    productTypeValue: '',
+    size: '',
+    height: '',
+    width: '',
+    length: '',
+    weight: '',
+  });
+
+  const [errors, setErrors] = useState({
+    skuDuplicate: false,
+    skuMissing: false,
+    nameMissing: false,
+    priceMissing: false,
+    sizeMissing: false,
+    weightMissing: false,
+    heightMissing: false,
+    widthMissing: false,
+    lengthMissing: false,
+    productTypeMissing: false,
+  });
+
   const navigate = useNavigate()
 
-
   const handleProductTypeChange = (event) => {
-    setProductType(event.target.value);
-    setProductTypeValue('');
-    setSize('');
-    setHeight('');
-    setWidth(''); 
-    setLength('');
-    setWeight('');
+    const value = event.target.value;
+    setProduct((prevState) => ({ ...prevState, productType: value }));
   };
 
   const handleProductTypeValueChange = (event) => {
-    setProductTypeValue(event.target.value);
+    const value = event.target.value;
+    if (product.productType === 'dvd') {
+      setProduct((prevState) => ({ ...prevState, size: value }));
+    } else if (product.productType === 'furniture') {
+      const [heightValue, widthValue, lengthValue] = value.split('x');
+      setProduct((prevState) => ({
+        ...prevState,
+        height: heightValue,
+        width: widthValue,
+        length: lengthValue,
+      }));
+    } else if (product.productType === 'book') {
+      setProduct((prevState) => ({ ...prevState, weight: value }));
+    }
   };
 
-  const handleSubmit =  (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
-    let dimensions = height ? `${height}*${width}*${length}` : 0
-    axios.post('http://localhost:8002/api/add-product', { sku, name, price, size: size ? size : 0, weight: weight?weight: 0, dimensions: dimensions? dimensions:0 })
-      .then(res => {
-        console.log("success", res)
-        setSku('')
-        setName('')
-        setPrice('')
-        setSize('')
-        setWidth('')
-        setHeight('')
-        setWeight('')
-        setProductType('')
-        setProductTypeValue('')
-        navigate('/', {replace: true})
+    let dimensions = product.height ? `${product.height}*${product.width}*${product.length}` : 0
+    const allFieldsFilled = () => {
+      if (product.sku && product.price && product.name) {
+        if ((product.productType === 'dvd' && product.size) || (product.productType === 'furniture' && product.product.width && product.height && product.length) || (product.productType === 'book' && product.weight)) {
+          return true
+        } else {
+          return false
+        }
+      }
+      else {
+        return false
+      }
 
-      })
-    .catch(err => console.log(err.response))
-
+    }
+    if (allFieldsFilled()) {
       
+      axios.post('http://localhost:8002/api/add-product', { sku: product.sku, name: product.name, price: product.price, size: product.size ? product.size : 0, weight: product.weight ? product.weight : 0, dimensions: dimensions ? dimensions : 0 })
+        .then((res) => {
+          setErrors({});
+          setProduct({
+            sku: '',
+            name: '',
+            price: '',
+            productType: '',
+            productTypeValue: '',
+            size: '',
+            height: '',
+            width: '',
+            length: '',
+            weight: '',
+          });
+          navigate('/', { replace: true })
+
+        })
+        .catch((error) => {
+          console.log(error);
+          if (error.response && error.response.status === 409) {
+            setErrors({
+              ...errors,
+              sku: 'SKU already exists',
+            });
+          }
+        });
+    } else {
+      console.log(allFieldsFilled());
+      console.log(product.sku, product.price, product.name, product.productType, product.size, product.height, product.weight, product.width, product.weight);
+      alert('All fields are required')
+    }
   };
 
 
   const handleCancel = (event) => {
-
     event.preventDefault();
-    setSku('')
-    setName('')
-    setPrice('')
-    setProductType('')
-    setProductTypeValue('')
-    setSize('')
-    setHeight('')
-    setWidth('')
-    setLength('')
-    setWeight('')
-    navigate('/', { replace: true })
-
-    
+    setProduct({
+      sku: '',
+      name: '',
+      price: '',
+      productType: '',
+      productTypeValue: '',
+      size: '',
+      height: '',
+      width: '',
+      length: '',
+      weight: '',
+    });
+    navigate('/', { replace: true });
+  };
+  const handleChange = (event) => {
+    const { id, value } = event.target;
+    setProduct((prevProduct) => ({
+      ...prevProduct,
+      [id]: value,
+    }));
   };
 
   return (
     <>
-
       <form id="product_form" onSubmit={handleSubmit} className="container my-4 " style={{ paddingBottom: '20%' }}>
-
         <div className="row sticky-top p-3">
           <div className="col-6">
             <h2>Product Add</h2>
@@ -93,92 +145,95 @@ const AddProductForm = () => {
               <button type="button" className="btn btn-secondary" onClick={handleCancel}>Cancel</button>
             </div>
           </div>
-
         </div>
         <hr className='mt-3' />
-
-
         <div className="form-group mt-3">
           <label htmlFor="skuInput" >SKU:</label>
-          <input type="text" className="form-control" id="sku" value={sku} onChange={(event) => setSku(event.target.value)} />
+          <input type="text" className={`form-control ${errors.skuDuplicate || errors.skuMissing ? 'is-invalid' : ''}`} id="sku" value={product.sku} onChange={handleChange} />
+          {errors.skuDuplicate && <div className="invalid-feedback">SKU already exists</div>}
+          {errors.skuMissing && <div className="invalid-feedback">Please enter a SKU</div>}
         </div>
-
         <div className="form-group">
-          <label htmlFor="nameInput" >Name:</label>
-          <input type="text" className="form-control" id="name" value={name} onChange={(event) => setName(event.target.value)} />
+          <label htmlFor="name">Product Name:</label>
+          <input type="text" className={`form-control ${errors.nameMissing ? 'is-invalid' : ''}`} id="name" value={product.name} onChange={handleChange} />
+          {errors.nameMissing && <div className="invalid-feedback">Please enter a product name</div>}
         </div>
-
         <div className="form-group">
-          <label htmlFor="priceInput" >Price:</label>
-          <input type="text" className="form-control" id="price" value={price} onChange={(event) => setPrice(event.target.value)} />
+          <label htmlFor="price">Price:</label>
+          <input type="number" className={`form-control ${errors.priceMissing ? 'is-invalid' : ''}`} id="price" value={product.price} onChange={handleChange} />
+          {errors.priceMissing && <div className="invalid-feedback">Please enter a price</div>}
         </div>
-
         <div className="form-group">
           <label htmlFor="productTypeInput">Type:</label>
-          <select className="form-control" id="productType" value={productType} onChange={handleProductTypeChange}>
+          <select className="form-control" id="productType" value={product.productType} onChange={handleProductTypeChange}>
             <option value="">Select a type</option>
             <option id='DVD' value="dvd">DVD</option>
             <option id='Furniture' value="furniture">Furniture</option>
             <option id='Book' value="book">Book</option>
           </select>
+          {errors.productTypeMissing && !product.productType && <div className="alert alert-danger alert-thin" role="alert">
+            The product Type is missing
+          </div>}
         </div>
-
-        {productType === 'dvd' && (
-
+        {product.productType === 'dvd' && (
           <>
             <p className='m-2 small'>Please provide the DVD size in Megabytes.</p>
-
             <div className="form-group">
               <label htmlFor="sizeInput">Size (MB)</label>
-              <input type="text" className="form-control" id="size" value={productTypeValue} onChange={handleProductTypeValueChange} />
+              <input type="text" className="form-control" id="size" value={product.size} onChange={handleProductTypeValueChange} />
+              {errors.sizeMissing && !product.size && <div className="alert alert-danger alert-thin" role="alert">
+                The size is missing
+              </div>}
             </div>
-          
           </>
-
         )}
-
-        {productType === 'furniture' && (
-
+        {product.productType === 'furniture' && (
           <>
             {/* {toast.info('Please provide dimensions in HxWxL format')} */}
             <p className='m-2 small'>Please provide dimensions in HxWxL format.</p>
             <div className="form-group">
               <label htmlFor="heightInput">Height (CM)</label>
-              <input type="text" className="form-control" id="height" value={height} onChange={(event) => setHeight(event.target.value)} />
+              <input type="text" className="form-control" id="height" value={product.height} onChange={handleProductTypeValueChange} />
+              {errors.heightMissing && !product.height && <div className="alert alert-danger alert-thin" role="alert">
+                The height is missing
+              </div>}
             </div>
-
             <div className="form-group">
               <label htmlFor="widthInput">Width (CM)</label>
-              <input type="text" className="form-control" id="width" value={width} onChange={(event) =>
-                setWidth(event.target.value)} />
+              <input type="text" className="form-control" id="width" value={product.width} onChange={handleProductTypeValueChange} />
+              {errors.widthMissing && !product.width && <div className="alert alert-danger alert-thin" role="alert">
+                The width is missing
+              </div>}
             </div>
             <div className="form-group">
               <label htmlFor="lengthInput">length (CM)</label>
-              <input type="text" className="form-control" id="length" value={length} onChange={(event) =>
-                setLength(event.target.value)} />
+              <input type="text" className="form-control" id="length" value={product.length} onChange={(event) =>
+              setProduct((prevState) => ({...prevState, length: event.target.value }))
+              } />
+              {errors.lengthMissing && !product.length && <div className="alert alert-danger alert-thin" role="alert">
+                The length is missing
+              </div>}
             </div>
           </>)}
-        {productType === 'book' && (
+        {product.productType === 'book' && (
           <>
             <p className='m-2 small'>Please provide the Book weight in Kilograms.</p>
 
             <div className="form-group">
               <label htmlFor="weight">Weight (KG):</label>
-              <input type="text" className="form-control" id="weight" value={weight} onChange={(event) => setWeight(event.target.value)} />
+              <input type="text" className="form-control" id="weight" value={product.weight} onChange={(event) => 
+              setProduct((prevState) => ({...prevState, weight: event.target.value }))} />
+              {errors.weightMissing && !product.weight && <div className="alert alert-danger alert-thin" role="alert">
+                The weigth is missing
+              </div>}
             </div>
-
           </>)}
- 
-
-
-
       </form>
       <div className="fixed-bottom bg-light d-flex align-items-center justify-content-center" style={{ height: '20%' }}>
         <hr style={{ borderTop: '1px solid #ddd' }} />
         <br />
         <p className="text-muted text-center" style={{ fontSize: '0.8rem' }}>Scandiweb Test Assignment</p>
       </div>
-
     </>
   )
 }

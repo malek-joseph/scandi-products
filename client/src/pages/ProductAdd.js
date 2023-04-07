@@ -56,80 +56,97 @@ const AddProductForm = () => {
     }
   };
 
-//=========
+  
+  
+//===========================================
 
+// Without Conditionals
+
+//===========================================
   const handleSubmit = (event) => {
     event.preventDefault();
 
     const productTypeValidation = {
       dvd: ['size'],
-      furniture: ['height', 'width', 'length'],
-      book: ['weight'],
+      furniture: ['length', 'width', 'height'],
+      book: ['weight']
     };
 
-    const productFields = {
-      sku: true,
-      name: true,
-      price: true,
-      size: false,
-      height: false,
-      width: false,
-      length: false,
-      weight: false,
+    const requiredFields = ['sku', 'name', 'price', 'productType', ...(product.productType ? productTypeValidation[product.productType] || [] : [])];
+
+    const newErrors = {
+      sku: false,
+      skuMissing: false,
+      nameMissing: false,
+      priceMissing: false,
+      sizeMissing: false,
+      weightMissing: false,
+      heightMissing: false,
+      widthMissing: false,
+      lengthMissing: false,
+      productTypeMissing: false,
     };
 
-    const { productType } = product;
-    const requiredFields = productTypeValidation[productType];
-    if (requiredFields) {
-      requiredFields.forEach((field) => {
-        productFields[field] = true;
-      });
+    for (const field of requiredFields) {
+      if (!product[field]) {
+        newErrors[field + "Missing"] = true;
+      }
     }
 
-    const allFieldsFilled = Object.values(productFields).every((filled) => filled);
-    if (allFieldsFilled) {
-      axios.post('http://localhost:8002/api/add-product', {
-        sku: product.sku,
-        name: product.name,
-        price: product.price,
-        size: product.productType === 'dvd' ? product.size || 0 : null,
-        weight: product.productType === 'book' ? product.weight || 0 : null,
-        dimensions:
-          product.productType === 'furniture'
-            ? `${product.height}*${product.width}*${product.length}`
-            : null,
-      })
-        .then((res) => {
-          setErrors({});
-          setProduct({
-            sku: '',
-            name: '',
-            price: '',
-            productType: '',
-            productTypeValue: '',
-            size: '',
-            height: '',
-            width: '',
-            length: '',
-            weight: '',
-          });
-          navigate('/', { replace: true });
-        })
-        .catch((error) => {
-          console.log(error);
-          if (error.response && error.response.status === 400) {
-            setErrors({
-              ...errors,
-              sku: 'SKU already exists',
-            });
-          }
-        });
- } else {
+    setErrors(newErrors);
+
+    if (Object.values(newErrors).includes(true)) {
       alert('All fields are required');
+      return;
     }
-  };
-  //============
 
+    let dimensions = product.height ? `${product.height}*${product.width}*${product.length}` : 0;
+
+    axios.post('http://localhost:8002/api/add-product', { sku: product.sku, name: product.name, price: product.price, size: product.size || 0, weight: product.weight || 0, dimensions: dimensions || 0 })
+      .then((res) => {
+        setErrors({
+          sku: false,
+          skuMissing: false,
+          nameMissing: false,
+          priceMissing: false,
+          sizeMissing: false,
+          weightMissing: false,
+          heightMissing: false,
+          widthMissing: false,
+          lengthMissing: false,
+          productTypeMissing: false,
+        });
+        setProduct({
+          sku: '',
+          name: '',
+          price: '',
+          productType: '',
+          productTypeValue: '',
+          size: '',
+          height: '',
+          width: '',
+          length: '',
+          weight: '',
+        });
+        navigate('/', { replace: true })
+
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response && error.response.status === 400) {
+          setErrors({
+            ...newErrors,
+            sku: true,
+          });
+        }
+      });
+  };
+
+
+
+//===========================================
+
+// With Conditionals
 
 //===========================================
 

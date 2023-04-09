@@ -1,6 +1,5 @@
 const express = require('express');
 const app = express();
-const port = 8002;
 const mysql = require('mysql');
 const cors = require("cors");
 const bodyParser = require('body-parser');
@@ -93,7 +92,7 @@ app.delete('/api/delete', (req, res) => {
 });
 
 
-app.listen(port, () => {
+app.listen(process.env.PORT, () => {
   console.log('listening...');
 });
 

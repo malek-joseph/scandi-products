@@ -1,9 +1,12 @@
 const express = require('express');
 const app = express();
+const port = process.env.PORT || 8002;
 const mysql = require('mysql');
 const cors = require("cors");
 const bodyParser = require('body-parser');
 const router = express.Router();
+// require('./config/env')
+// require('dotenv').config()
 
 
 const db  = mysql.createConnection({
@@ -13,8 +16,7 @@ const db  = mysql.createConnection({
   database: "scandi-products",
   Port: 3306
 });
-
-app.use(express.json());
+(express.json());
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -92,8 +94,12 @@ app.delete('/api/delete', (req, res) => {
 });
 
 
-app.listen(process.env.PORT, () => {
+app.listen(port, () => {
   console.log('listening...');
 });
+
+// app.listen(port, () => {
+//   console.log('listening...');
+// });
 
 

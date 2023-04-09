@@ -1,12 +1,18 @@
 const express = require('express');
 const app = express();
-const port = process.env.PORT || 8002;
+// const PORT = 8002
 const mysql = require('mysql');
 const cors = require("cors");
 const bodyParser = require('body-parser');
 const router = express.Router();
+const dotenv = require("dotenv");
+dotenv.config();
 // require('./config/env')
-// require('dotenv').config()
+// const dotenv = require("dotenv");
+// const port =  PORT
+// const port = dotenv.config().parsed.PORT || PORT
+
+
 
 
 const db  = mysql.createConnection({
@@ -94,7 +100,8 @@ app.delete('/api/delete', (req, res) => {
 });
 
 
-app.listen(port, () => {
+app.listen(process.env.PORT || 8002, () => {
+  // console.log(dotenv.config().parsed.PORT);
   console.log('listening...');
 });
 

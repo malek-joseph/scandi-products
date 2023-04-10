@@ -10,7 +10,7 @@ const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const init = () => {
-    axios.get('http://localhost:8002/api/').then((res) => {
+    axios.get('http://localhost:8003/api/').then((res) => {
       if (res.error) {
         console.log(res.error);
       } else {
@@ -33,8 +33,8 @@ const ProductList = () => {
   };
   //=========API: deleting Cards from db and UI 
   const handleMassDelete = () => {
-    // console.log(selectedProducts);
-    axios.delete('http://localhost:8002/api/delete', { data: { skus: selectedProducts } })
+    console.log(selectedProducts);
+    axios.delete('http://localhost:8003/api/delete', { data: { skus: selectedProducts } })
       .then(response => {
         setProducts((products) =>
           products.filter((product) => !selectedProducts.includes(product.sku))

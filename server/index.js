@@ -5,13 +5,10 @@ const mysql = require('mysql');
 const cors = require("cors");
 const bodyParser = require('body-parser');
 const router = express.Router();
-const dotenv = require("dotenv");
-dotenv.config();
-// require('./config/env')
-// const dotenv = require("dotenv");
-// const port =  PORT
-// const port = dotenv.config().parsed.PORT || PORT
 
+
+
+app.use(bodyParser.json());
 
 
 
@@ -82,7 +79,7 @@ app.get("/api/", (req, res) => {
 app.delete('/api/delete', (req, res) => {
   console.log(req.skus);
   const { skus } = req.body;
-
+  console.log(skus);
   if (!Array.isArray(skus)) {
     res.status(400).send('Invalid input: skus must be an array');
     return;
@@ -100,7 +97,7 @@ app.delete('/api/delete', (req, res) => {
 });
 
 
-app.listen(process.env.PORT || 8002, () => {
+app.listen(process.env.PORT || 8003, () => {
   // console.log(dotenv.config().parsed.PORT);
   console.log('listening...');
 });
